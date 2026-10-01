@@ -8,8 +8,8 @@ so-loader port of the Android version (1.6.3) of *Riptide GP* (Vector Unit).
 It runs the original `libBlue.so` + `libfmodex.so` + `libfmodevent.so` with an emulated Java layer (FalsoJNI).
 You need your own copy of the game APK; nothing from the game is distributed here.
 
-> Status: boots on real hardware, shaders link, FMOD music plays; rendering is under
-> investigation. See [`RELEASE.md`](RELEASE.md) (draft) and `port_progress.md`.
+> Status: menus and racing run on real hardware. See [`RELEASE.md`](RELEASE.md) and
+> `port_progress.md`.
 
 ## Install
 

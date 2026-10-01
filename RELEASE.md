@@ -1,13 +1,12 @@
-# Riptide GP — PS Vita · DRAFT (not released)
+# Riptide GP — PS Vita · v1.0.0 "First Ride"
 
-> DRAFT: the game does not render yet, so there is nothing to publish.
-> When it becomes playable, paste the section below into the GitHub release description
-> (adjust the version and tag, e.g. `v1.0.0`).
+> Paste the section below into the GitHub release description. The title above goes in the
+> release-title field; suggested tag: `v1.0.0`.
 
 ---
 
-**Work in progress: the Android version of Riptide GP (1.6.3) boots on PS Vita —
-asset loading, shader linking and FMOD sound all run on real hardware.**
+**First public build: the Android version of Riptide GP (1.6.3) runs on PS Vita —
+menus and racing, with FMOD sound.**
 
 ## Requirements
 
@@ -28,7 +27,9 @@ asset loading, shader linking and FMOD sound all run on real hardware.**
 
 - Boot through the NativeActivity lifecycle (`OnInitApp`/`OnInitWindow`), full asset loading
   from `assets/Base.apf` (textures, shaders, sounds).
-- All 36 shader programs compile and link on real hardware.
+- All 57 shader programs compile and link on real hardware (confirmed in the console
+  log, zero link failures, zero crashes across the run).
+- Main menu and racing, confirmed playable on real hardware.
 - FMOD music and sound effects (AudioTrack output).
 - Saved profile (`files/profile`) written and reloaded.
 - Logs per run in `ux0:data/riptidegp/logs/`.
@@ -64,8 +65,6 @@ Two bugs stood between the APK and a running game, each found on real hardware:
 
 ## Known issues
 
-- Rendering is not verified on hardware yet (the softfp vitaGL fix is built and deployed,
-  pending a console test).
-- Physical controls are wired (MOGA events) but not verified in a race yet.
-- `AMotionEvent_getAxisValue` is not implemented (accelerometer sensor returns "not supported",
-  same as the engine expects on devices without it).
+- Frame rate has not been measured yet; long-session stability is unconfirmed.
+- `AMotionEvent_getAxisValue` is not implemented (accelerometer sensor reports "not
+  supported", which the engine already handles as a no-motion device).

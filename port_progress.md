@@ -121,3 +121,14 @@ Ver PORTING_PLAN.md sección 4. Actualizar con un bug confirmado a la vez en pru
 - **Estado:** build debug OK, `eboot.bin` (595.7 KB) subido por FTP.
   **Pendiente test en consola: lanzar y traer `logs/riptidegp_003.log`** (+
   `.psp2dmp`/screenshot según lo que se vea).
+
+## Fase 10: jugable en consola real — v1.0.0 "First Ride" (2026-10-01)
+- **Log:** `logs/riptidegp_003.log` (1376 líneas): arranque limpio, 57 programas
+  `glLinkProgram OK` (cero fallos de link, cero crashes), profile guardado dos
+  veces (save/load OK), warnings solo benignos (`cpu/present`, `nvmap`,
+  `GameInfo.json` opcional, `AMotionEvent_getAxisValue` ya conocido).
+- **Estado:** menús y carreras confirmados jugables en consola real con la build
+  de Fase 9 (vitaGL vendorizada softfp + binds diferidos). `README.md` y
+  `RELEASE.md` finalizados para v1.0.0.
+- **Pendiente a futuro:** medir FPS, estabilidad en sesiones largas, opciones
+  reales en `config.txt` (hoy solo placeholders del boilerplate).
