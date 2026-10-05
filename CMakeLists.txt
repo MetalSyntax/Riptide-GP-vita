@@ -36,7 +36,7 @@ include("${VITASDK}/share/vita.cmake" REQUIRED)
 set(VITA_APP_NAME "Riptide GP")
 set(VITA_TITLEID "PSVRGP001")
 set(VITA_VPKNAME "riptidegp")
-set(VITA_VERSION "01.00")
+set(VITA_VERSION "01.01")
 set(VITA_MKSFOEX_FLAGS "-d ATTRIBUTE2=12")
 
 # Optional: used for "send" and "dump" targets

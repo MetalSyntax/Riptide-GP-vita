@@ -1,12 +1,28 @@
-# Riptide GP — PS Vita · v1.0.0 "First Ride"
+# Riptide GP — PS Vita · v1.0.1
 
 > Paste the section below into the GitHub release description. The title above goes in the
-> release-title field; suggested tag: `v1.0.0`.
+> release-title field; suggested tag: `v1.0.1`.
 
 ---
 
-**First public build: the Android version of Riptide GP (1.6.3) runs on PS Vita —
-menus and racing, with FMOD sound.**
+**Bug-fix release: your progress is now saved. Championships, unlocked boats and
+upgrades carry over between sessions, so you can quit and continue a championship
+where you left off.**
+
+## What's new in 1.0.1
+
+- **Progress is kept between launches.** v1.0.0 wrote the profile but never managed to read it
+  back, so every launch started a fresh profile and overwrote the old one. The engine read the
+  save file's size through a field that only exists in Android's `FILE` struct, got 0 and treated
+  the profile as empty. The loader now measures the file size itself (hook on
+  `VuGenericFile::size`).
+- Your save lives in `ux0:data/riptidegp/files/profile`. A `saves/` folder is not needed; you can
+  keep a manual backup copy of `profile` anywhere (e.g. `ux0:data/riptidegp/saves/`) and copy it
+  back to `files/` with VitaShell while the game is closed.
+
+**Updating from 1.0.0:** install the new `riptidegp.vpk` over the old one; the data files in
+`ux0:data/riptidegp/` stay as they are. Progress made on 1.0.0 was being reset on every launch,
+so it cannot be recovered; from 1.0.1 on, it is kept.
 
 ## Requirements
 
@@ -31,8 +47,8 @@ menus and racing, with FMOD sound.**
   log, zero link failures, zero crashes across the run).
 - Main menu and racing, confirmed playable on real hardware.
 - FMOD music and sound effects (AudioTrack output).
-- Saved profile (`ux0:data/riptidegp/files/profile`) is written (but see Known issues: it is
-  not read back in this build).
+- Progress saved and restored across launches (`ux0:data/riptidegp/files/profile`): continue
+  championships, keep unlocked boats and upgrades.
 - Logs per run in `ux0:data/riptidegp/logs/`.
 
 ## Controls
@@ -51,7 +67,7 @@ None yet (`config.txt` only carries boilerplate placeholder keys).
 
 ## Under the hood
 
-Two bugs stood between the APK and a running game, each found on real hardware:
+Three bugs stood between the APK and a fully playable game, each found on real hardware:
 
 - **Crash in `glBindAttribLocation` on the first shader.** The engine binds its ~10 attribute
   locations right after `glCreateProgram()`, before attaching any shader -- legal GLES2, but
@@ -63,12 +79,14 @@ Two bugs stood between the APK and a running game, each found on real hardware:
   crossing loader<->vitaGL arrived garbled. vitaGL is now vendored (`vendor/vitaGL`, same tree as
   the Carnivores Vita ports) and built with the softfp ABI. Same root cause as Carnivores
   logs 004-007.
+- **Progress reset on every launch (fixed in 1.0.1).** `VuGenericFile::size()` inlines
+  `fileno()` as a read of bionic's `FILE::_file` (offset `0x0E`) and passes it to `fstat()`. The
+  loader's `FILE*` comes from SceLibc with a different layout, so it always got fd 0, `fstat`
+  failed and the profile looked empty. `source/patch.c` hooks the function and computes the size
+  with `ftell`/`fseek`.
 
 ## Known issues
 
-- **Progress is not kept between launches.** The profile is written, but the engine reads its
-  size through a bionic-only `FILE` field, gets 0 and starts a fresh profile, overwriting the old
-  one. Fixed after v1.0.0 (hook on `VuGenericFile::size` in `source/patch.c`).
 - Frame rate has not been measured yet; long-session stability is unconfirmed.
 - `AMotionEvent_getAxisValue` is not implemented (accelerometer sensor reports "not
   supported", which the engine already handles as a no-motion device).

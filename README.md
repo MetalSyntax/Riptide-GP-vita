@@ -36,8 +36,8 @@ any folder for it. A `ux0:data/riptidegp/saves/` folder is **not** required — 
 or writes it. You can use it (or any other folder) to keep a manual backup of `profile`: to restore,
 copy it back to `ux0:data/riptidegp/files/` with VitaShell while the game is closed.
 
-> Builds up to v1.0.0 wrote the profile but could not read it back (the engine read the file size
-> through a bionic-only `FILE` field), so progress reset on every launch. Fixed by hooking
+> v1.0.0 wrote the profile but could not read it back (the engine read the file size
+> through a bionic-only `FILE` field), so progress reset on every launch. Fixed in v1.0.1 by hooking
 > `VuGenericFile::size` in `source/patch.c`.
 
 ## Controls
