@@ -19,8 +19,8 @@
 extern "C" {
 #endif
 
-extern int  setting_sampleSetting;
-extern bool setting_sampleSetting2;
+extern bool setting_accelerometer; ///< 1 = Vita motion sensor feeds the engine's accelerometer
+extern bool setting_invertTilt;    ///< 1 = flip left/right tilt
 
 void settings_load();
 void settings_save();

@@ -344,6 +344,7 @@ so_default_dynlib default_dynlib[] = {
         { "AKeyEvent_getAction", (uintptr_t)&AKeyEvent_getAction },
         { "AKeyEvent_getKeyCode", (uintptr_t)&AKeyEvent_getKeyCode },
         { "AMotionEvent_getAction", (uintptr_t)&AMotionEvent_getAction },
+        { "AMotionEvent_getAxisValue", (uintptr_t)&AMotionEvent_getAxisValue },
         { "AMotionEvent_getPointerCount", (uintptr_t)&AMotionEvent_getPointerCount },
         { "AMotionEvent_getPointerId", (uintptr_t)&AMotionEvent_getPointerId },
         { "AMotionEvent_getX", (uintptr_t)&AMotionEvent_getX },

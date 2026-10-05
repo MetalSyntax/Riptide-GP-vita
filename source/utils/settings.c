@@ -12,12 +12,12 @@
 
 #define CONFIG_FILE_PATH DATA_PATH"config.txt"
 
-int  setting_sampleSetting;
-bool setting_sampleSetting2;
+bool setting_accelerometer;
+bool setting_invertTilt;
 
 void settings_reset() {
-    setting_sampleSetting  = 1;
-    setting_sampleSetting2 = true;
+    setting_accelerometer = true;
+    setting_invertTilt    = false;
 }
 
 void settings_load() {
@@ -30,8 +30,8 @@ void settings_load() {
 
     if (config) {
         while (EOF != fscanf(config, "%[^ ] %d\n", buffer, &value)) {
-            if 		(strcmp("setting_sampleSetting", buffer) == 0) 	setting_sampleSetting  = (int)value;
-            else if (strcmp("setting_sampleSetting2", buffer) == 0) setting_sampleSetting2 = (bool)value;
+            if      (strcmp("accelerometer", buffer) == 0) setting_accelerometer = (bool)value;
+            else if (strcmp("invert_tilt", buffer) == 0)   setting_invertTilt    = (bool)value;
         }
         fclose(config);
     }
@@ -41,8 +41,8 @@ void settings_save() {
     FILE *config = fopen(CONFIG_FILE_PATH, "w+");
 
     if (config) {
-        fprintf(config, "%s %d\n", "setting_sampleSetting", (int)(setting_sampleSetting));
-        fprintf(config, "%s %d\n", "setting_sampleSetting2", (int)(setting_sampleSetting2));
+        fprintf(config, "%s %d\n", "accelerometer", (int)(setting_accelerometer));
+        fprintf(config, "%s %d\n", "invert_tilt", (int)(setting_invertTilt));
         fclose(config);
     }
 }

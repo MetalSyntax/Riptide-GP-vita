@@ -45,6 +45,7 @@ copy it back to `ux0:data/riptidegp/files/` with VitaShell while the game is clo
 | Vita | Action |
 |---|---|
 | Touch screen | Original touch controls |
+| Tilt the console | Accelerometer (tilt steering) |
 | Left stick | Left analog axis (MOGA X/Y) |
 | Right stick | Right analog axis (MOGA Z/RZ) |
 | Cross / Circle / Square / Triangle | MOGA A / B / X / Y |
@@ -58,10 +59,22 @@ Buttons and sticks are forwarded as MOGA gamepad events (`VuGamePadHelper`), the
 interface the Android version uses for external gamepads, so in-game meaning follows the
 game's own gamepad mapping. In menus, use the touch screen.
 
+> **Physical controls vs. tilt:** the buttons and sticks only work with the game's **Simple**
+> control method. If you switch to tilt steering in the game's options, the console's tilt
+> steers the boat and the physical buttons/sticks stop responding; switch back to Simple to use
+> them again.
+
 ## Options
 
-`ux0:data/riptidegp/config.txt` exists, but there are no user-facing options yet (only
-boilerplate placeholder keys). This section will grow once the game renders.
+Edit `ux0:data/riptidegp/config.txt` (one `key value` per line; create it if missing):
+
+| Key | Default | Meaning |
+|---|---|---|
+| `accelerometer` | `1` | `1` = the Vita's motion sensor drives the game's tilt steering; `0` = report the console lying flat (no tilt) |
+| `invert_tilt` | `0` | `1` = swap left/right tilt |
+
+Pick the tilt control method in the game's own options to steer by tilting the console (this
+disables the physical buttons/sticks; see Controls).
 
 ## Building
 

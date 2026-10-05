@@ -77,5 +77,6 @@ uint32_t AMotionEvent_getPointerCount(const AInputEvent *event);
 int32_t AMotionEvent_getPointerId(const AInputEvent *event, uint32_t idx);
 float AMotionEvent_getX(const AInputEvent *event, uint32_t idx);
 float AMotionEvent_getY(const AInputEvent *event, uint32_t idx);
+float AMotionEvent_getAxisValue(const AInputEvent *event, int32_t axis, uint32_t idx);
 
 #endif // SOLOADER_INPUT_QUEUE_H

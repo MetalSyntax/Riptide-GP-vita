@@ -149,3 +149,24 @@ Ver PORTING_PLAN.md sección 4. Actualizar con un bug confirmado a la vez en pru
   una sola lectura `rb` (antes dos: reintento por fallo) y escrituras `wb` normales.
   README documenta la ruta del save (`files/profile`) y que `saves/` no se usa
   (solo sirve como carpeta de backup manual).
+
+## Fase 12: acelerómetro real + `AMotionEvent_getAxisValue` (2026-10-04)
+- **FPS:** 60 FPS fijos confirmados por el usuario en consola.
+- **Acelerómetro:** `reimpl/sensor.c` ya tenía el puente a `sceMotion` pero
+  apagado (`SENSOR_USE_MOTION 0`, vector "plano" constante). El motor
+  (`OnSensorEvent` -> `VuAndroidAccel::onAccelEvent`) rota el vector según
+  `Display.getRotation()`, que `java.c` devuelve como `ROTATION_0` -> los ejes
+  llegan alineados a pantalla (Android +X der, +Y arriba, +Z fuera, +g en reposo).
+  SceMotion usa los mismos ejes pero reporta la gravedad (-1 G en Z boca arriba),
+  así que se niegan los 3 ejes (misma convención que Raging-Thunder-2-vita).
+  Ahora siempre activo salvo `accelerometer 0` en `config.txt`; `invert_tilt 1`
+  invierte X. Loguea la primera muestra (`accel first sample: ...`).
+- **`AMotionEvent_getAxisValue`:** era el único `dlsym: Unknown symbol` del log.
+  Implementado en `reimpl/input_queue.c` (AXIS_X/Y = getX/getY, resto 0) y
+  añadido a la tabla de `dynlib.c`.
+- **config.txt:** se reemplazaron las claves placeholder del boilerplate por
+  `accelerometer` e `invert_tilt` (`utils/settings.c`).
+- **Estado:** confirmado en consola por el usuario: la inclinación maneja el bote
+  con el signo correcto (sin `invert_tilt`). Limitación conocida: los controles
+  físicos (MOGA) solo funcionan con el método de control *Simple* del juego; con
+  inclinación seleccionada dejan de responder. Documentado en README/RELEASE.

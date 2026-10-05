@@ -2,25 +2,23 @@
  * @file  sensor.c
  * @brief Accelerometer for the engine, backed by sceMotion.
  *
- * Tilt steering is only one of the game's control schemes; with the MOGA
- * pad path (see source/controls.c) the analog stick drives the boat. Until the
- * axis mapping is confirmed on real hardware, SENSOR_USE_MOTION stays 0 and a
- * constant "device lying flat" gravity vector is reported, so the engine gets
- * well-formed samples but no phantom steering.
+ * Display.getRotation() reports ROTATION_0 (java.c), so the engine takes the
+ * samples as already screen-aligned: Android +X right, +Y up, +Z out of the
+ * screen, reporting the reaction to gravity (+g on Z lying face up). SceMotion
+ * uses the same axes but reports the gravity vector itself, hence the sign
+ * flip. `accelerometer 0` in config.txt reports a constant "lying flat"
+ * vector instead (no tilt); `invert_tilt 1` flips left/right.
  */
 
 #include "reimpl/sensor.h"
 #include "utils/logger.h"
+#include "utils/settings.h"
 
 #include <psp2/motion.h>
 #include <psp2/kernel/processmgr.h>
 
 #include <pthread.h>
 #include <string.h>
-
-#ifndef SENSOR_USE_MOTION
-#define SENSOR_USE_MOTION 0
-#endif
 
 struct ASensorManager { int dummy; };
 struct ASensor { int type; };
@@ -75,12 +73,11 @@ int ASensorEventQueue_enableSensor(ASensorEventQueue *queue, const ASensor *sens
     l_debug("ASensorEventQueue_enableSensor(%p, %p)", queue, sensor);
     if (!queue || !sensor)
         return -1;
-#if SENSOR_USE_MOTION
-    if (!g_motion_started) {
-        sceMotionStartSampling();
-        g_motion_started = 1;
+    if (setting_accelerometer && !g_motion_started) {
+        int ret = sceMotionStartSampling();
+        g_motion_started = ret >= 0;
+        l_info("sceMotionStartSampling: 0x%08x", ret);
     }
-#endif
     queue->enabled = 1;
     queue->last_us = sceKernelGetProcessTimeWide();
     return 0;
@@ -118,17 +115,25 @@ ssize_t ASensorEventQueue_getEvents(ASensorEventQueue *queue, ASensorEvent *even
     events[0].type = ASENSOR_TYPE_ACCELEROMETER;
     events[0].timestamp = (int64_t)now * 1000;
 
-#if SENSOR_USE_MOTION
     SceMotionSensorState st;
-    if (sceMotionGetSensorState(&st, 1) >= 0) {
-        // TODO(hw): confirm signs on a real console. Android: +X right,
-        // +Y up, +Z out of the screen (landscape device = natural orientation).
-        events[0].acceleration.x = -st.accelerometer.x * ASENSOR_STANDARD_GRAVITY;
+    if (g_motion_started && sceMotionGetSensorState(&st, 1) >= 0) {
+        float x = -st.accelerometer.x * ASENSOR_STANDARD_GRAVITY;
+        if (setting_invertTilt)
+            x = -x;
+        events[0].acceleration.x = x;
         events[0].acceleration.y = -st.accelerometer.y * ASENSOR_STANDARD_GRAVITY;
         events[0].acceleration.z = -st.accelerometer.z * ASENSOR_STANDARD_GRAVITY;
+
+        static int logged = 0;
+        if (!logged) {
+            logged = 1;
+            l_info("accel first sample: vita g=(%.2f, %.2f, %.2f) -> android (%.2f, %.2f, %.2f)",
+                   st.accelerometer.x, st.accelerometer.y, st.accelerometer.z,
+                   events[0].acceleration.x, events[0].acceleration.y,
+                   events[0].acceleration.z);
+        }
         return 1;
     }
-#endif
     events[0].acceleration.x = 0.0f;
     events[0].acceleration.y = 0.0f;
     events[0].acceleration.z = ASENSOR_STANDARD_GRAVITY;

@@ -144,3 +144,14 @@ float AMotionEvent_getY(const AInputEvent *event, uint32_t idx) {
         return 0.0f;
     return event->y[idx];
 }
+
+// Looked up with dlsym() for gamepad axes. Our pad goes through the MOGA JNI
+// path (controls.c), so only touch events reach here: AXIS_X/AXIS_Y (0/1)
+// mirror getX/getY, every other axis is at rest.
+float AMotionEvent_getAxisValue(const AInputEvent *event, int32_t axis, uint32_t idx) {
+    if (axis == 0)
+        return AMotionEvent_getX(event, idx);
+    if (axis == 1)
+        return AMotionEvent_getY(event, idx);
+    return 0.0f;
+}

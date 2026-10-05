@@ -5,9 +5,8 @@
 
 ---
 
-**Bug-fix release: your progress is now saved. Championships, unlocked boats and
-upgrades carry over between sessions, so you can quit and continue a championship
-where you left off.**
+**Your progress is now saved — quit and continue a championship where you left off —
+and tilt steering works with the Vita's accelerometer. Locked 60 FPS.**
 
 ## What's new in 1.0.1
 
@@ -16,6 +15,10 @@ where you left off.**
   save file's size through a field that only exists in Android's `FILE` struct, got 0 and treated
   the profile as empty. The loader now measures the file size itself (hook on
   `VuGenericFile::size`).
+- **Accelerometer.** The Vita's motion sensor now feeds the game's accelerometer, so the
+  tilt control method steers by tilting the console (confirmed on real hardware).
+  Configurable in `config.txt` (`accelerometer`, `invert_tilt`).
+- `AMotionEvent_getAxisValue` implemented (it was the last unresolved symbol in the log).
 - Your save lives in `ux0:data/riptidegp/files/profile`. A `saves/` folder is not needed; you can
   keep a manual backup copy of `profile` anywhere (e.g. `ux0:data/riptidegp/saves/`) and copy it
   back to `files/` with VitaShell while the game is closed.
@@ -49,6 +52,8 @@ so it cannot be recovered; from 1.0.1 on, it is kept.
 - FMOD music and sound effects (AudioTrack output).
 - Progress saved and restored across launches (`ux0:data/riptidegp/files/profile`): continue
   championships, keep unlocked boats and upgrades.
+- Locked 60 FPS in races.
+- Tilt steering with the Vita's accelerometer.
 - Logs per run in `ux0:data/riptidegp/logs/`.
 
 ## Controls
@@ -56,6 +61,7 @@ so it cannot be recovered; from 1.0.1 on, it is kept.
 | Vita | Action |
 |---|---|
 | Touch screen | Original touch controls |
+| Tilt the console | Accelerometer (tilt steering) |
 | Left / Right sticks | MOGA analog axes |
 | Cross / Circle / Square / Triangle | MOGA A / B / X / Y |
 | L / R (+ L2 / R2 on PSTV/DS4) | MOGA shoulder buttons / trigger axes |
@@ -63,7 +69,10 @@ so it cannot be recovered; from 1.0.1 on, it is kept.
 
 ## Options
 
-None yet (`config.txt` only carries boilerplate placeholder keys).
+`ux0:data/riptidegp/config.txt` (one `key value` per line):
+
+- `accelerometer 1` — Vita motion sensor drives tilt steering (`0` = no tilt).
+- `invert_tilt 0` — `1` swaps left/right tilt.
 
 ## Under the hood
 
@@ -87,6 +96,8 @@ Three bugs stood between the APK and a fully playable game, each found on real h
 
 ## Known issues
 
-- Frame rate has not been measured yet; long-session stability is unconfirmed.
-- `AMotionEvent_getAxisValue` is not implemented (accelerometer sensor reports "not
-  supported", which the engine already handles as a no-motion device).
+- **Physical buttons and sticks only work with the *Simple* control method.** With tilt
+  steering selected in the game's options, tilting steers the boat but the buttons/sticks stop
+  responding. Switch back to *Simple* to use them.
+
+Report anything else you find with the log from `ux0:data/riptidegp/logs/`.
