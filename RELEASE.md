@@ -31,7 +31,8 @@ menus and racing, with FMOD sound.**
   log, zero link failures, zero crashes across the run).
 - Main menu and racing, confirmed playable on real hardware.
 - FMOD music and sound effects (AudioTrack output).
-- Saved profile (`files/profile`) written and reloaded.
+- Saved profile (`ux0:data/riptidegp/files/profile`) is written (but see Known issues: it is
+  not read back in this build).
 - Logs per run in `ux0:data/riptidegp/logs/`.
 
 ## Controls
@@ -65,6 +66,9 @@ Two bugs stood between the APK and a running game, each found on real hardware:
 
 ## Known issues
 
+- **Progress is not kept between launches.** The profile is written, but the engine reads its
+  size through a bionic-only `FILE` field, gets 0 and starts a fresh profile, overwriting the old
+  one. Fixed after v1.0.0 (hook on `VuGenericFile::size` in `source/patch.c`).
 - Frame rate has not been measured yet; long-session stability is unconfirmed.
 - `AMotionEvent_getAxisValue` is not implemented (accelerometer sensor reports "not
   supported", which the engine already handles as a no-motion device).

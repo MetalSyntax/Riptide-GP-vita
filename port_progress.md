@@ -132,3 +132,20 @@ Ver PORTING_PLAN.md sección 4. Actualizar con un bug confirmado a la vez en pru
   `RELEASE.md` finalizados para v1.0.0.
 - **Pendiente a futuro:** medir FPS, estabilidad en sesiones largas, opciones
   reales en `config.txt` (hoy solo placeholders del boilerplate).
+
+## Fase 11: el progreso no se guarda -> `VuGenericFile::size` con FILE bionic (2026-10-04)
+- **Síntoma (reporte de usuario + `logs/riptidegp_003.log`):** el juego no
+  conserva el progreso entre sesiones. El save (`ux0:data/riptidegp/files/profile`)
+  se escribe (`fopen(..., wb)` OK), pero al cargar:
+  `fopen(profile, rb): OK` -> `fstat(0): -1` -> `fclose`.
+- **Causa:** `VuGenericFile::size(void*)` (`0x190218`) no llama a `fileno()`:
+  lo inlinea como `ldrsh.w r0, [fp, #14]` (campo `_file` del `FILE` de bionic)
+  y llama `fstat`. Con `USE_SCELIBC_IO` el `FILE*` es de SceLibc (layout
+  distinto) -> fd 0 -> `fstat` falla -> size 0 -> profile tratado como vacío ->
+  se crea uno nuevo y se pisa el viejo. Único sitio con ese patrón en libBlue.
+- **Fix:** `source/patch.c` hookea `_ZN13VuGenericFile4sizeEPv` con una versión
+  que mide con `ftell`/`fseek(SEEK_END)` (SceLibcBridge) y restaura la posición.
+- **Estado:** confirmado en consola (`logs/riptidegp_004.log`): `VuGenericFile::size(...): 2731`,
+  una sola lectura `rb` (antes dos: reintento por fallo) y escrituras `wb` normales.
+  README documenta la ruta del save (`files/profile`) y que `saves/` no se usa
+  (solo sirve como carpeta de backup manual).

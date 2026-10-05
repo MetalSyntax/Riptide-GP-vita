@@ -23,6 +23,23 @@ You need your own copy of the game APK; nothing from the game is distributed her
 Alternative: stage the same layout under `ux0_data/riptidegp/` and run
 `extras/scripts/upload_data.sh <vita-ip>` (add `--no-assets` to skip re-uploading `Base.apf`).
 
+## Save data
+
+Progress is stored in a single file:
+
+```
+ux0:data/riptidegp/files/profile
+```
+
+The game creates it on first launch and rewrites it every time it saves; you don't need to create
+any folder for it. A `ux0:data/riptidegp/saves/` folder is **not** required — the game never reads
+or writes it. You can use it (or any other folder) to keep a manual backup of `profile`: to restore,
+copy it back to `ux0:data/riptidegp/files/` with VitaShell while the game is closed.
+
+> Builds up to v1.0.0 wrote the profile but could not read it back (the engine read the file size
+> through a bionic-only `FILE` field), so progress reset on every launch. Fixed by hooking
+> `VuGenericFile::size` in `source/patch.c`.
+
 ## Controls
 
 | Vita | Action |
