@@ -287,8 +287,7 @@ void glBindAttribLocation_soloader(GLuint prog, GLuint index,
     slot->index = index;
     strncpy(slot->name, name, sizeof(slot->name) - 1);
     slot->name[sizeof(slot->name) - 1] = '\0';
-    l_debug("glBindAttribLocation queued: prog=%u index=%u name=%s",
-            prog, index, slot->name);
+    // Not logged: ~20 lines per program cost ~6 s of boot in Debug builds.
 }
 
 static void flush_attrib_binds(GLuint prog, int replay) {
@@ -296,9 +295,6 @@ static void flush_attrib_binds(GLuint prog, int replay) {
     for (int i = 0; i < num_pending_attrib_binds; i++) {
         if (pending_attrib_binds[i].prog == prog) {
             if (replay) {
-                l_debug("glBindAttribLocation replay: prog=%u index=%u name=%s",
-                        prog, pending_attrib_binds[i].index,
-                        pending_attrib_binds[i].name);
                 glBindAttribLocation(prog, pending_attrib_binds[i].index,
                                      pending_attrib_binds[i].name);
             } else {

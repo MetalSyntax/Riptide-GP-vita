@@ -212,3 +212,49 @@ Ver PORTING_PLAN.md sección 4. Actualizar con un bug confirmado a la vez en pru
   el comm_id con el parámetro 12 de AppMgr, que es el **TITLE_ID**: en PoP coinciden, acá no.
   Fix: se quitó esa lectura (comm_id fijo `RPGP00001`) y, sin TRP legible, ya no se llama a NP.
 - **Consola (2026-11-05):** confirmado por el usuario, el set de trofeos se instala. Release v1.0.2.
+
+## Fase 15: Google Play Games reemplazado offline (botón Sign In, logros, tablas) (2026-11-05)
+- **Síntoma:** botón de Google (Sign In) abajo a la izquierda; "Logros" del menú no abre nada;
+  la tabla de cada evento dice "no conectado".
+- **Causa:** el menú es el SKU Google (`Screens/MainMenu` = `MainMenu_Google`). El botón se
+  muestra con `!IsLoggedIn` (`VuOpenFeintLoginEntity`). Sin login, `showAchievements()`
+  llama a `beginUserInitiatedSignIn` (no-op) y `getScores()` falla.
+- **Fix (`java.c`):** `gameInitialize()` llama a `onSignIn(<usuario de la Vita>)`, como el
+  Java real. `showAchievements()` -> `broadcast("OnPushScreen", "Screens/Achievements")`
+  (pantalla propia del juego para los SKU sin Google). `getScores(id)` -> una fila con el
+  mejor tiempo personal leído del profile (`Stats/Race/<pista>/TotalTime`,
+  `Stats/HotLap/<pista>/BestLapTime`, igual que `VuStatsManager`), id -> pista según
+  `LeaderboardDB`. `unlockAchievement`/`refreshAchievements` responden éxito al instante
+  (logueado, `VuAchievementManager` espera esa respuesta en el estado Write).
+- **Estado:** build debug OK, pendiente en consola.
+- **Consola (logs 011/012):** pantalla negra / congelado justo después de
+  `online: signed in offline` (falta el `accel first sample` del frame siguiente). Hipótesis:
+  los callbacks nativos respondidos inline reentran en `VuEventManager` desde un handler
+  (`OnAndroidSignIn` -> `refreshAchievements` -> `onRefreshAchievementsDone` -> `sendDelayed`).
+  Fix: las respuestas van por un hilo aparte (`online_async`), como el hilo UI de Java.
+- **Consola (log 013):** sin cuelgue (`callback kind=2`), botón de Google oculto, la pantalla
+  de logros abre. La de récords no: nunca hubo `getScores`, porque el botón de tabla de cada
+  evento (y el del menú) llama a `showLeaderboard`/`showAllLeaderboards` (panel de Google).
+  Ahora los dos abren `Screens/Leaderboards`, la tabla propia del juego.
+- **Consola (log 014):** la tabla abre pero sin récord: `getScores(CgkI09HCp-cJEAIQLA)` =
+  CityA/HotLap -> `best -1`. Profile bajado por FTP: hay `Stats/Race/CityA/TotalTime` y
+  `Stats/HotLap/FactoryB/BestLapTime` (la ruta leída es correcta). `Screens/Leaderboards`
+  arma el id con `VuGameUtil` `Track`+`GameType` = último evento *jugado*, no el elegido
+  en la lista (antes de jugar, id vacío). Fix: `showLeaderboard(id)` recibe el GoogleID del
+  evento seleccionado; se guarda y `getScores` responde para ese. El botón del menú
+  (`showAllLeaderboards`) lo limpia y usa el del juego.
+- **Consola (logs 018-020):** nunca hubo `showLeaderboard`; la tabla se abre por la UI del
+  juego y todos los `getScores` llegan con id vacío (`Track`/`GameType` de `VuGameUtil` no
+  existen hasta largar un evento). Fix: id desconocido -> una fila por cada récord personal
+  (`<pista> Race|Hot Lap`, tiempo); id conocido -> una fila con el nombre del jugador.
+  **Confirmado en consola (log 021):** `getScores() -> 2 row(s)`, los récords aparecen.
+
+## Fase 16: arranque lento en builds Debug (2026-11-05)
+- **Síntoma:** ~10 s de pantalla negra antes del logo de Vector Unit.
+- **Medición:** el log ahora lleva ms desde el inicio (`logger.c`). Log 017: cada línea
+  cuesta ~8,5 ms (`sceIoWrite` sin buffer) y había ~760 líneas de
+  `glBindAttribLocation queued/replay` (20 por programa). Los shaders salen de la caché de
+  vitaGL (~14 ms c/u).
+- **Fix:** sin esas líneas (`glutil.c`). Log 018: primer dibujo 11,6 s -> 5,8 s. Lo que
+  queda es real: carga de .so ~1,7 s, `vglInitExtended` ~1,8 s, diálogo de trofeos ~0,9 s.
+  Release no escribe log, así que no tenía este costo.

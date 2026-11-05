@@ -9,6 +9,7 @@
 
 #include <psp2/kernel/clib.h>
 #include <psp2/kernel/threadmgr.h>
+#include <psp2/kernel/processmgr.h>
 #include <psp2/io/fcntl.h>
 #include <psp2/io/stat.h>
 
@@ -89,7 +90,8 @@ static void _log_file_write(const char *line) {
 
     // Strip ANSI color sequences for the file copy.
     static char clean[2048];
-    int j = 0;
+    // Milliseconds since process start, to measure where boot time goes.
+    int j = sceClibSnprintf(clean, sizeof(clean), "[%6u] ", (unsigned)(sceKernelGetProcessTimeLow() / 1000));
     for (int i = 0; line[i] && j < (int)sizeof(clean) - 1; i++) {
         if (line[i] == '\x1B') {
             while (line[i] && line[i] != 'm') i++;

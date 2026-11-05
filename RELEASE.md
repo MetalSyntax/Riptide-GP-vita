@@ -1,27 +1,24 @@
-# Riptide GP — PS Vita · v1.0.2
+# Riptide GP — PS Vita · v1.0.3
 
 > Paste the section below into the GitHub release description. The title above goes in the
-> release-title field; suggested tag: `v1.0.2`.
+> release-title field; suggested tag: `v1.0.3`.
 
 ---
 
-**Native PS Vita trophies: 29 trophies + Platinum, unlocked from the game's own achievements.**
+**Google Play leftovers replaced offline: no more Sign In button, achievements and records
+screens work.**
 
-## What's new in 1.0.2
+## What's new in 1.0.3
 
-- **Trophies.** The game's achievements now unlock real PS Vita trophies (20 bronze, 7 silver,
-  2 gold and a Platinum), with the official names and descriptions. Requires the
-  [NoTrpDrm](https://github.com/Rinnegatamante/NoTrpDrm) plugin under `*main` in
-  `ur0:tai/config.txt`. The trophy set is installed on the first launch (the screen stays black
-  for a few seconds while it does).
-- **Achievements from an existing save are granted too**, the next time any achievement makes
-  progress.
-- "Throw Down" (beat a friend's challenge) needed Google Play and has no trophy.
-- The engine now detects the Vita's 4 CPU cores, so it uses its "High" quality profile
-  instead of "Low" (water droplets on the camera lens are back).
+- **Google Sign In button removed** from the bottom-left of the main menu. The game now
+  signs in "offline" with your PS Vita username.
+- **Achievements screen opens** from the menu (the game's own list, with your progress).
+- **Leaderboard shows your personal records.** Without online servers, the table lists your
+  best time on every event you have completed (Race = total time, Hot Lap = best lap).
+- Trophies from 1.0.2 keep working as before.
 
-**Updating from 1.0.1:** install the new `riptidegp.vpk` over the old one (the full VPK, not only
-the eboot: the trophy pack lives in it). Data files and your save stay as they are.
+**Updating from 1.0.2:** install the new `riptidegp.vpk` over the old one. Data files and your
+save stay as they are.
 
 ## Requirements
 
@@ -52,6 +49,7 @@ the eboot: the trophy pack lives in it). Data files and your save stay as they a
 - Locked 60 FPS in races.
 - Tilt steering with the Vita's accelerometer.
 - Native PS Vita trophies (29 + Platinum).
+- Offline achievements screen and personal-records leaderboard (no Google Play).
 - Logs per run in `ux0:data/riptidegp/logs/`.
 
 ## Controls

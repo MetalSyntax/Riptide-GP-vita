@@ -32,6 +32,12 @@ granted the next time any achievement progresses. "Throw Down" (beat a friend's
 challenge) needs Google Play and has no trophy. The trophy pack is generated with
 `extras/scripts/generate_trophies.py`.
 
+### Google Play (offline)
+
+Google Play Games is replaced offline: the Sign In button is hidden, the menu's
+achievements screen shows the game's own list, and the leaderboard lists your personal
+best on each event (no online scores).
+
 ## Save data
 
 Progress is stored in a single file:
