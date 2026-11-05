@@ -170,3 +170,45 @@ Ver PORTING_PLAN.md sección 4. Actualizar con un bug confirmado a la vez en pru
   con el signo correcto (sin `invert_tilt`). Limitación conocida: los controles
   físicos (MOGA) solo funcionan con el método de control *Simple* del juego; con
   inclinación seleccionada dejan de responder. Documentado en README/RELEASE.
+
+## Fase 13: gotas en pantalla ausentes -> `DeviceType "Low"` por 0 núcleos (2026-10-22)
+- **Síntoma (reporte de usuario):** las salpicaduras salen volando de costado en vez de
+  pegarse a la "lente" y escurrir; en Campeonato 1 / nivel 3 las salpicaduras se ven
+  como rayas y la luna junto a la estatua deja un reflejo/sombra rectangular.
+- **Causa:** `OnInitWindow` elige `DeviceType` según `NvSysCaps.numCores` (`+0x310`):
+  `<=1` -> "Low", `>3` -> "High", si no "Medium". `nvGetSystemCapabilities` solo llena
+  ese campo leyendo `/sys/devices/system/cpu/present` (warning en el log); al fallar
+  queda 0 (memset) -> "Low". Con `!= "High"` llama `VuLensWaterManager::setEnabled(false)`
+  (vtable +0x1c, `0x10fc90`) y "Low" además apaga otras opciones de calidad.
+- **Fix:** `extras/cpu_present` (`0-3`, empaquetado en la VPK como `app0:/cpu_present`)
+  y `fopen_soloader` redirige la ruta de sysfs ahí -> 4 núcleos -> "High".
+- **Estado:** build debug OK. **Requiere reinstalar la VPK** (archivo nuevo en app0,
+  un deploy solo del eboot no alcanza). Pendiente en consola: confirmar gotas en lente,
+  revisar Campeonato 1 nivel 3 (rayas/luna) y que se mantengan los 60 FPS con "High".
+
+## Fase 14: trofeos nativos (NoTrpDrm), como en Prince of Persia Classic (2026-11-05)
+- **Fuente de los logros:** `Base.apf` -> `VuDBAsset/AchievementDB` (30 entradas, clave =
+  nombre interno) y textos oficiales `Ach_N_Name/Desc` de `VuStringAsset/en-us` (es-es
+  los deja en inglés). Se omite el 23 "Throw Down" (requiere Google Play) -> 29 + platino.
+- **Hook:** toda variación de logro pasa por
+  `VuAchievementManager::updateProgression(name, pct)` (`0x14298c`; `setCompleted` y
+  `setTaskCompleted` le hacen tail-call). `patch.c` lo engancha con `SO_CONTINUE` y
+  después consulta `isAchievementUnlocked()` del motor para los 29 nombres -> esto también
+  sincroniza logros de saves viejos. No se usa el path Java (`unlockAchievement`), que
+  depende de `isSignedIn`.
+- **Trofeos:** `source/trophies.c` copiado de PoP (comm_id `RPGP00001`, contexto + diálogo
+  de setup antes de arrancar el motor, hilo desbloqueador). TRP generado por
+  `extras/scripts/generate_trophies.py` -> `extras/trophy/RPGP00001_00/TROPHY.TRP`
+  (íconos = icon0 del LiveArea con marco por rango; ICON0 = recorte de pic0).
+- **Estado:** compila (release, sin warnings en los archivos tocados) y la VPK incluye
+  `sce_sys/trophy/RPGP00001_00/TROPHY.TRP`. **Requiere reinstalar la VPK.** Pendiente en
+  consola: diálogo de instalación del set, notificación al ganar una medalla y sync de un
+  save con logros previos.
+- **Consola:** error del sistema `C0-11133-9` al abrir el juego. Misma causa que en
+  Carnivores DH: el comm_id `PSVRGP001` no tiene formato NP (4 letras + 5 dígitos).
+  Cambiado a `RPGP00001` (TRP `RPGP00001_00`); el TITLEID sigue siendo `PSVRGP001`.
+- **Consola:** NP-6182-7 con `RPGP00001`. Log: `app param(12) readback: 'PSVRGP001'` y
+  `TRP NOT readable at app0:sce_sys/trophy/PSVRGP001_00/...`. `trophies.c` (de PoP) pisaba
+  el comm_id con el parámetro 12 de AppMgr, que es el **TITLE_ID**: en PoP coinciden, acá no.
+  Fix: se quitó esa lectura (comm_id fijo `RPGP00001`) y, sin TRP legible, ya no se llama a NP.
+- **Consola (2026-11-05):** confirmado por el usuario, el set de trofeos se instala. Release v1.0.2.

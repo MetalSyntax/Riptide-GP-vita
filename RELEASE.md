@@ -1,37 +1,34 @@
-# Riptide GP — PS Vita · v1.0.1
+# Riptide GP — PS Vita · v1.0.2
 
 > Paste the section below into the GitHub release description. The title above goes in the
-> release-title field; suggested tag: `v1.0.1`.
+> release-title field; suggested tag: `v1.0.2`.
 
 ---
 
-**Your progress is now saved — quit and continue a championship where you left off —
-and tilt steering works with the Vita's accelerometer. Locked 60 FPS.**
+**Native PS Vita trophies: 29 trophies + Platinum, unlocked from the game's own achievements.**
 
-## What's new in 1.0.1
+## What's new in 1.0.2
 
-- **Progress is kept between launches.** v1.0.0 wrote the profile but never managed to read it
-  back, so every launch started a fresh profile and overwrote the old one. The engine read the
-  save file's size through a field that only exists in Android's `FILE` struct, got 0 and treated
-  the profile as empty. The loader now measures the file size itself (hook on
-  `VuGenericFile::size`).
-- **Accelerometer.** The Vita's motion sensor now feeds the game's accelerometer, so the
-  tilt control method steers by tilting the console (confirmed on real hardware).
-  Configurable in `config.txt` (`accelerometer`, `invert_tilt`).
-- `AMotionEvent_getAxisValue` implemented (it was the last unresolved symbol in the log).
-- Your save lives in `ux0:data/riptidegp/files/profile`. A `saves/` folder is not needed; you can
-  keep a manual backup copy of `profile` anywhere (e.g. `ux0:data/riptidegp/saves/`) and copy it
-  back to `files/` with VitaShell while the game is closed.
+- **Trophies.** The game's achievements now unlock real PS Vita trophies (20 bronze, 7 silver,
+  2 gold and a Platinum), with the official names and descriptions. Requires the
+  [NoTrpDrm](https://github.com/Rinnegatamante/NoTrpDrm) plugin under `*main` in
+  `ur0:tai/config.txt`. The trophy set is installed on the first launch (the screen stays black
+  for a few seconds while it does).
+- **Achievements from an existing save are granted too**, the next time any achievement makes
+  progress.
+- "Throw Down" (beat a friend's challenge) needed Google Play and has no trophy.
+- The engine now detects the Vita's 4 CPU cores, so it uses its "High" quality profile
+  instead of "Low" (water droplets on the camera lens are back).
 
-**Updating from 1.0.0:** install the new `riptidegp.vpk` over the old one; the data files in
-`ux0:data/riptidegp/` stay as they are. Progress made on 1.0.0 was being reset on every launch,
-so it cannot be recovered; from 1.0.1 on, it is kept.
+**Updating from 1.0.1:** install the new `riptidegp.vpk` over the old one (the full VPK, not only
+the eboot: the trophy pack lives in it). Data files and your save stay as they are.
 
 ## Requirements
 
 - PS Vita / PS TV with HENkaku/Enso (3.60–3.74 with a kernel plugin loader).
 - `kubridge.skprx` in `*KERNEL` of your taiHEN config.
 - `libshacccg.suprx` in `ur0:data/` (use ShaRKBR33D).
+- Optional, for trophies: `NoTrpDrm.suprx` in `*main`.
 - Your own copy of the game APK (Android 1.6.3, `armeabi-v7a`).
 
 ## Install
@@ -54,6 +51,7 @@ so it cannot be recovered; from 1.0.1 on, it is kept.
   championships, keep unlocked boats and upgrades.
 - Locked 60 FPS in races.
 - Tilt steering with the Vita's accelerometer.
+- Native PS Vita trophies (29 + Platinum).
 - Logs per run in `ux0:data/riptidegp/logs/`.
 
 ## Controls

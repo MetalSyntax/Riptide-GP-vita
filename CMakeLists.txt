@@ -36,7 +36,7 @@ include("${VITASDK}/share/vita.cmake" REQUIRED)
 set(VITA_APP_NAME "Riptide GP")
 set(VITA_TITLEID "PSVRGP001")
 set(VITA_VPKNAME "riptidegp")
-set(VITA_VERSION "01.01")
+set(VITA_VERSION "01.02")
 set(VITA_MKSFOEX_FLAGS "-d ATTRIBUTE2=12")
 
 # Optional: used for "send" and "dump" targets
@@ -108,6 +108,7 @@ add_executable(${CMAKE_PROJECT_NAME}
                source/dynlib.c
                source/java.c
                source/patch.c
+               source/trophies.c
                source/reimpl/bits/_ctype.c
                source/reimpl/egl.c
                source/reimpl/errno.c
@@ -177,6 +178,8 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
                       SceGxm_stub
                       ScePower_stub
                       SceVshBridge_stub
+                      SceSysmodule_stub
+                      SceNpTrophy_stub
                       )
 
 add_dependencies(${CMAKE_PROJECT_NAME} vitaGL_lib)
@@ -187,11 +190,13 @@ vita_create_vpk(${VITA_VPKNAME}.vpk ${VITA_TITLEID} eboot.bin
                 NAME ${VITA_APP_NAME}
                 FILE ${CMAKE_SOURCE_DIR}/extras/cpuinfo cpuinfo
                 ${CMAKE_SOURCE_DIR}/extras/meminfo meminfo
+                ${CMAKE_SOURCE_DIR}/extras/cpu_present cpu_present
                 ${CMAKE_SOURCE_DIR}/extras/livearea/icon0.png sce_sys/icon0.png
                 ${CMAKE_SOURCE_DIR}/extras/livearea/pic0.png sce_sys/pic0.png
                 ${CMAKE_SOURCE_DIR}/extras/livearea/startup.png sce_sys/livearea/contents/startup.png
                 ${CMAKE_SOURCE_DIR}/extras/livearea/bg0.png sce_sys/livearea/contents/bg0.png
                 ${CMAKE_SOURCE_DIR}/extras/livearea/template.xml sce_sys/livearea/contents/template.xml
+                ${CMAKE_SOURCE_DIR}/extras/trophy/RPGP00001_00/TROPHY.TRP sce_sys/trophy/RPGP00001_00/TROPHY.TRP
                 )
 
 add_custom_target(send

@@ -36,6 +36,9 @@ FILE * fopen_soloader(const char * filename, const char * mode) {
         return fopen_soloader("app0:/cpuinfo", mode);
     } else if (strcmp(filename, "/proc/meminfo") == 0) {
         return fopen_soloader("app0:/meminfo", mode);
+    } else if (strcmp(filename, "/sys/devices/system/cpu/present") == 0) {
+        // nvGetSystemCapabilities: sin esto cuenta 0 núcleos -> DeviceType "Low" -> sin LensWater
+        return fopen_soloader("app0:/cpu_present", mode);
     }
 
 #ifdef USE_SCELIBC_IO

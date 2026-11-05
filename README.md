@@ -23,6 +23,15 @@ You need your own copy of the game APK; nothing from the game is distributed her
 Alternative: stage the same layout under `ux0_data/riptidegp/` and run
 `extras/scripts/upload_data.sh <vita-ip>` (add `--no-assets` to skip re-uploading `Base.apf`).
 
+### Trophies (optional)
+
+The game's 29 offline achievements unlock native PS Vita trophies (plus a Platinum).
+This needs the [NoTrpDrm](https://github.com/Rinnegatamante/NoTrpDrm) plugin under
+`*main` in `ur0:tai/config.txt`. Achievements already earned in an existing save are
+granted the next time any achievement progresses. "Throw Down" (beat a friend's
+challenge) needs Google Play and has no trophy. The trophy pack is generated with
+`extras/scripts/generate_trophies.py`.
+
 ## Save data
 
 Progress is stored in a single file:

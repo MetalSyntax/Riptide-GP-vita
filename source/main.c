@@ -27,6 +27,7 @@
 #include <so_util/so_util.h>
 
 #include "controls.h"
+#include "trophies.h"
 #include "reimpl/audio.h"
 #include "reimpl/native_activity.h"
 
@@ -50,6 +51,9 @@ int main() {
 
     gl_init();
     l_success("vitaGL initialized.");
+
+    // Before the engine thread starts: the setup dialog drives vglSwapBuffers itself.
+    trophies_init();
 
     void (*setInternalDataPath)(JNIEnv *, jclass, jstring) =
             (void *)so_symbol(&so_mod, "Java_com_vectorunit_blue_Blue_setInternalDataPath");
